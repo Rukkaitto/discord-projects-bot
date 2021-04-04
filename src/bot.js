@@ -1,5 +1,5 @@
-const { User, Server, Project } = require("./db");
-const { ObjectId } = require("mongoose").Types;
+const { Server } = require("./db");
+const { MessageEmbed } = require("discord.js");
 
 module.exports = (client, token) => {
   client.on("ready", () => {
@@ -36,19 +36,23 @@ module.exports = (client, token) => {
               },
             ],
           });
-          await server.save();
+          const result = await server.save();
+          if (result) message.reply("created project successfully.");
           break;
         case "list":
           const { projects } = server;
 
-          const projectList = projects.reduce((acc, project) => {
+          const messageEmbed = new MessageEmbed().setTitle("Project list");
+          const fields = projects.map((project) => {
             const { title, members } = project;
-            return `${acc}- ${title} (${members.reduce((acc2, member) => {
-              return `${acc2} <@${member.id}>,`;
-            }, "")})\n`;
-          }, "List of all projects on this server:\n");
+            return {
+              name: title,
+              value: members.map((member) => `<@${member.id}>`).join(", "),
+            };
+          });
+          messageEmbed.addFields(fields);
 
-          channel.send(projectList);
+          channel.send(messageEmbed);
           break;
         default:
           break;
