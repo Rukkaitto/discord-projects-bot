@@ -1,0 +1,59 @@
+require("dotenv").config();
+const api = require("express")();
+const bodyParser = require("body-parser");
+const { db, Server, Project, User } = require("./db");
+
+api.use(bodyParser.urlencoded({ extended: false }));
+
+const port = 3000;
+
+db.on("error", console.error.bind(console, "connection error:"));
+
+db.once("open", () => {
+  api.get("/:serverId/projects", async (req, res) => {
+    const { serverId } = req.params;
+    var server = await Server.findById(serverId);
+    if (server) {
+      res.json(server.projects);
+    }
+  });
+
+  api.post("/:serverId/projects", async (req, res) => {
+    const { serverId } = req.params;
+    const { title } = req.body;
+    const server = await Server.findById(serverId);
+    if (server) {
+      server.projects.push({
+        title: title,
+      });
+      const result = await server.save();
+      if (result) {
+        res.json({ response: "Successfully created new project." });
+      } else {
+        res.json({ response: "Could not create project." });
+      }
+    }
+  });
+
+  api.post("/:serverId/:projectId/members", async (req, res) => {
+    const { serverId, projectId } = req.params;
+    const { id, username, avatar } = req.body;
+    const server = await Server.findById(serverId);
+    const project = await server.projects.id(projectId);
+    project.members.push({
+      _id: id,
+      username: username,
+      avatar: avatar,
+    });
+    const result = await server.save();
+    if (result) {
+      res.json({ response: "Successfully created new project." });
+    } else {
+      res.json({ response: "Could not create project." });
+    }
+  });
+
+  api.listen(port, () => {
+    console.log(`Listening on port ${port}`);
+  });
+});

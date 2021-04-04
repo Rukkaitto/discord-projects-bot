@@ -67,6 +67,7 @@ module.exports = (client, token) => {
 };
 
 const getServer = async (guild) => {
+  console.log(guild.id);
   var server = await Server.findById(guild.id);
   if (!server) {
     serverQuery = new Server({
