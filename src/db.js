@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
-const serverSchema = require("./models/server");
-const projectSchema = require("./models/project");
-const userSchema = require("./models/user");
+const serverSchema = require("./schemas/server");
+const projectSchema = require("./schemas/project");
+const userSchema = require("./schemas/user");
 
 const dbUser = process.env.DB_USER;
 const dbPassword = process.env.DB_PASSWORD;
