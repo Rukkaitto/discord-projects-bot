@@ -3,9 +3,10 @@ const { getServer, postServer } = require("./api");
 
 const getOrCreateServer = async (guild) => {
   const { id, name } = guild;
+  const icon = guild.iconURL({ dynamic: true });
   var server = await getServer(id);
   if (!server) {
-    server = await postServer(id, name);
+    server = await postServer(id, name, icon);
   }
   return server;
 };

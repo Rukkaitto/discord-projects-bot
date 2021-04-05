@@ -12,10 +12,11 @@ const getServer = async (req, res) => {
 };
 
 const postServer = async (req, res) => {
-  const { id, name } = req.body;
+  const { id, name, icon } = req.body;
   server = new Server({
     _id: id,
     name: name,
+    icon: icon,
   });
   const result = await server.save();
   res.json(result);

@@ -7,8 +7,8 @@ const getServer = async (serverId) => {
   return response.data;
 };
 
-const postServer = async (id, name) => {
-  const response = await axios.post(`${apiUrl}/servers`, { id, name });
+const postServer = async (id, name, icon) => {
+  const response = await axios.post(`${apiUrl}/servers`, { id, name, icon });
   return response.data;
 };
 
