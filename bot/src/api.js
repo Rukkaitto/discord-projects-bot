@@ -7,25 +7,25 @@ const getServer = async (serverId) => {
   return response.data;
 };
 
-const postServer = async (id, name, icon) => {
-  const response = await axios.post(`${apiUrl}/servers`, { id, name, icon });
+const postServer = async (_id, name, icon) => {
+  const response = await axios.post(`${apiUrl}/servers`, { _id, name, icon });
   return response.data;
 };
 
-const postProject = async (serverId, title, id, username, avatar) => {
+const postProject = async (serverId, title, _id, username, avatar) => {
   const response = await axios.post(`${apiUrl}/${serverId}/projects`, {
     title,
-    id,
+    _id,
     username,
     avatar,
   });
   return response.data;
 };
 
-const postMember = async (serverId, projectId, id, username, avatar) => {
+const postMember = async (serverId, projectId, _id, username, avatar) => {
   const response = await axios.post(
     `${apiUrl}/${serverId}/${projectId}/members`,
-    { id, username, avatar }
+    { _id, username, avatar }
   );
   return response.data;
 };

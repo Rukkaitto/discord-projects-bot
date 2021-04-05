@@ -12,11 +12,11 @@ const getServer = async (req, res) => {
 };
 
 const postServer = async (req, res) => {
-  const { id, name, icon } = req.body;
+  const { _id, name, icon } = req.body;
   server = new Server({
-    _id: id,
-    name: name,
-    icon: icon,
+    _id,
+    name,
+    icon,
   });
   const result = await server.save();
   res.json(result);
@@ -24,16 +24,16 @@ const postServer = async (req, res) => {
 
 const postProject = async (req, res) => {
   const { serverId } = req.params;
-  const { title, id, username, avatar } = req.body;
+  const { title, _id, username, avatar } = req.body;
   const server = await Server.findById(serverId);
   if (server) {
     server.projects.push({
       title: title,
       members: [
         {
-          _id: id,
-          username: username,
-          avatar: avatar,
+          _id,
+          username,
+          avatar,
         },
       ],
     });
@@ -48,13 +48,13 @@ const postProject = async (req, res) => {
 
 const postMember = async (req, res) => {
   const { serverId, projectId } = req.params;
-  const { id, username, avatar } = req.body;
+  const { _id, username, avatar } = req.body;
   const server = await Server.findById(serverId);
   const project = await server.projects.id(projectId);
   project.members.push({
-    _id: id,
-    username: username,
-    avatar: avatar,
+    _id,
+    username,
+    avatar,
   });
   const result = await server.save();
   if (result) {
