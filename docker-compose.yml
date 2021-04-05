@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  api:
+    container_name: api
+    build: ./api
+    volumes:
+      - ./api:/usr/src/api
+      - /usr/src/api/node_modules
+    ports:
+      - "3000:3000"
+    links:
+      - mongo
+  mongo:
+    container_name: mongo
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./database:/data/db
+  bot:
+    container_name: bot
+    build: ./bot
+    volumes:
+      - ./bot:/usr/src/bot
+      - /usr/src/bot/node_modules
