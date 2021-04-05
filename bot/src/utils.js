@@ -11,15 +11,14 @@ const getOrCreateServer = async (guild) => {
   return server;
 };
 
-const makeProjectListMessageEmbed = (projects, emojis) => {
+const makeProjectListMessageEmbed = (projects) => {
   const messageEmbed = new MessageEmbed()
     .setTitle("Project list")
     .setColor("#81f097");
   const fields = projects.map((project, idx) => {
     const { title, members } = project;
-    const emoji = emojis[idx];
     return {
-      name: `${title} ${emoji}`,
+      name: `${idx + 1}. ${title}`,
       value: `Members: ${members
         .map((member) => `<@${member._id}>`)
         .join(", ")}`,

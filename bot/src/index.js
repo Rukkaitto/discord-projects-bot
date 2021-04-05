@@ -1,14 +1,13 @@
 require("dotenv").config();
 const { Client } = require("discord.js");
-const { random: randomEmoji } = require("random-unicode-emoji");
-const { postProject } = require("./api");
+const { postProject, postMember } = require("./api");
 const {
   getOrCreateServer,
   makeProjectListMessageEmbed,
   addReactionsToMessage,
 } = require("./utils");
 
-const client = new Client();
+const client = new Client({ partials: ["MESSAGE", "CHANNEL", "REACTION"] });
 const token = process.env.DISCORD_TOKEN;
 
 client.on("ready", () => {
@@ -25,26 +24,35 @@ client.on("message", async (message) => {
 
   if (command === projectCommand) {
     const server = await getOrCreateServer(guild);
+    const { projects } = server;
 
     switch (action) {
       case "create":
-        const result = await postProject(
+        const title = param;
+        const projectResult = await postProject(
           guild.id,
-          param,
+          title,
           author.id,
           username,
           author.displayAvatarURL()
         );
-        message.reply(result.response);
+        message.reply(projectResult.response);
         break;
       case "list":
-        const { projects } = server;
-        const emojis = randomEmoji({ count: projects.length });
+        const messageEmbed = makeProjectListMessageEmbed(projects);
+        await channel.send(messageEmbed);
 
-        const messageEmbed = makeProjectListMessageEmbed(projects, emojis);
-        const sentMessage = await channel.send(messageEmbed);
-
-        await addReactionsToMessage(sentMessage, emojis);
+        break;
+      case "join":
+        const number = parseInt(param);
+        const memberResult = await postMember(
+          guild.id,
+          projects[number - 1]._id,
+          author.id,
+          username,
+          author.displayAvatarURL()
+        );
+        message.reply(memberResult.response);
         break;
       default:
         break;
