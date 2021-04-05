@@ -1,6 +1,7 @@
 const { Server } = require("./db");
 const { MessageEmbed } = require("discord.js");
 const { random: randomEmoji } = require("random-unicode-emoji");
+const { getServer, postServer, postProject, postMember } = require("./api");
 
 module.exports = (client, token) => {
   client.on("ready", () => {
@@ -16,22 +17,13 @@ module.exports = (client, token) => {
     const projectCommand = "!project";
 
     if (command === projectCommand) {
-      const server = await getServer(guild);
+      const server = await getServerIfNotExists(guild);
+      console.log(server)
 
       switch (action) {
         case "create":
-          server.projects.push({
-            title: param,
-            members: [
-              {
-                _id: author.id,
-                username: username,
-                avatar: author.displayAvatarURL(),
-              },
-            ],
-          });
-          const result = await server.save();
-          if (result) message.reply("created project successfully.");
+          const result = await postProject(guild.id, param, author.id, username, author.displayAvatarURL());
+          message.reply(result.response);
           break;
         case "list":
           const { projects } = server;
@@ -42,15 +34,16 @@ module.exports = (client, token) => {
             .setColor("#81f097");
           const fields = projects.map((project, idx) => {
             const { title, members } = project;
+            console.log(members);
             const emoji = emojis[idx];
             return {
               name: `${title} ${emoji}`,
               value: `Members: ${members
-                .map((member) => `<@${member.id}>`)
+                .map((member) => `<@${member._id}>`)
                 .join(", ")}`,
             };
           });
-          messageEmbed.addFields(fields);
+          messageEmbed.addFields(...fields);
 
           const sentMessage = await channel.send(messageEmbed);
           emojis.forEach(async (emoji) => {
@@ -66,15 +59,11 @@ module.exports = (client, token) => {
   client.login(token);
 };
 
-const getServer = async (guild) => {
-  console.log(guild.id);
-  var server = await Server.findById(guild.id);
+const getServerIfNotExists = async (guild) => {
+  const { id, name } = guild;
+  var server = await getServer(id);
   if (!server) {
-    serverQuery = new Server({
-      _id: guild.id,
-      name: guild.name,
-    });
-    server = await serverQuery.save();
+    server = await postServer(id, name);
   }
   return server;
 };

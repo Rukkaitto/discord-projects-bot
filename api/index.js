@@ -3,28 +3,50 @@ const express = require("express");
 const api = express()
 const { db, Server, Project, User } = require("./db");
 
-api.use(express.urlencoded({ extended: true }));
+api.use(express.json());
 
 const port = 3000;
 
 db.on("error", console.error.bind(console, "connection error:"));
 
 db.once("open", () => {
-  api.get("/:serverId/projects", async (req, res) => {
-    const { serverId } = req.params;
-    var server = await Server.findById(serverId);
-    if (server) {
-      res.json(server.projects);
+  api.get("/servers", async (req, res) => {
+    const servers = await Server.find({});
+    if(servers) {
+      res.json(servers);
     }
+  });
+
+  api.get("/:serverId", async (req, res) => {
+    const { serverId } = req.params;
+    const server = await Server.findById(serverId);
+    res.json(server);
+  });
+
+  api.post("/servers", async (req, res) => {
+    const { id, name } = req.body;
+    server = new Server({
+      _id: id,
+      name: name,
+    });
+    const result = await server.save();
+    res.json(result);
   });
 
   api.post("/:serverId/projects", async (req, res) => {
     const { serverId } = req.params;
-    const { title } = req.body;
+    const { title, id, username, avatar } = req.body;
     const server = await Server.findById(serverId);
     if (server) {
       server.projects.push({
         title: title,
+        members: [
+          {
+            _id: id,
+            username: username,
+            avatar: avatar,
+          },
+        ],
       });
       const result = await server.save();
       if (result) {
