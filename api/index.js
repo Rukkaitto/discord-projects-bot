@@ -1,9 +1,9 @@
 require("dotenv").config();
-const api = require("express")();
-const bodyParser = require("body-parser");
+const express = require("express");
+const api = express()
 const { db, Server, Project, User } = require("./db");
 
-api.use(bodyParser.urlencoded({ extended: false }));
+api.use(express.urlencoded({ extended: true }));
 
 const port = 3000;
 
@@ -47,9 +47,9 @@ db.once("open", () => {
     });
     const result = await server.save();
     if (result) {
-      res.json({ response: "Successfully created new project." });
+      res.json({ response: "Successfully added member to project." });
     } else {
-      res.json({ response: "Could not create project." });
+      res.json({ response: "Could not add member to project." });
     }
   });
 
