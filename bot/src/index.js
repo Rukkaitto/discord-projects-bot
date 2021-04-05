@@ -1,7 +1,12 @@
 require("dotenv").config();
-const { Client, MessageEmbed } = require("discord.js");
-const { getServer, postServer, postProject } = require("./api");
+const { Client } = require("discord.js");
 const { random: randomEmoji } = require("random-unicode-emoji");
+const { postProject } = require("./api");
+const {
+  getOrCreateServer,
+  makeProjectListMessageEmbed,
+  addReactionsToMessage,
+} = require("./utils");
 
 const client = new Client();
 const token = process.env.DISCORD_TOKEN;
@@ -19,36 +24,27 @@ client.on("message", async (message) => {
   const projectCommand = "!project";
 
   if (command === projectCommand) {
-    const server = await getServerIfNotExists(guild);
+    const server = await getOrCreateServer(guild);
 
     switch (action) {
       case "create":
-        const result = await postProject(guild.id, param, author.id, username, author.displayAvatarURL());
+        const result = await postProject(
+          guild.id,
+          param,
+          author.id,
+          username,
+          author.displayAvatarURL()
+        );
         message.reply(result.response);
         break;
       case "list":
         const { projects } = server;
         const emojis = randomEmoji({ count: projects.length });
 
-        const messageEmbed = new MessageEmbed()
-          .setTitle("Project list")
-          .setColor("#81f097");
-        const fields = projects.map((project, idx) => {
-          const { title, members } = project;
-          const emoji = emojis[idx];
-          return {
-            name: `${title} ${emoji}`,
-            value: `Members: ${members
-              .map((member) => `<@${member._id}>`)
-              .join(", ")}`,
-          };
-        });
-        messageEmbed.addFields(...fields);
-
+        const messageEmbed = makeProjectListMessageEmbed(projects, emojis);
         const sentMessage = await channel.send(messageEmbed);
-        emojis.forEach(async (emoji) => {
-          await sentMessage.react(emoji);
-        });
+
+        await addReactionsToMessage(sentMessage, emojis);
         break;
       default:
         break;
@@ -57,12 +53,3 @@ client.on("message", async (message) => {
 });
 
 client.login(token);
-
-const getServerIfNotExists = async (guild) => {
-  const { id, name } = guild;
-  var server = await getServer(id);
-  if (!server) {
-    server = await postServer(id, name);
-  }
-  return server;
-};

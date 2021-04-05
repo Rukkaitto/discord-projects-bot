@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const api = express()
+const api = express();
 const { db, Server, Project, User } = require("./db");
 
 api.use(express.json());
@@ -12,7 +12,7 @@ db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
   api.get("/servers", async (req, res) => {
     const servers = await Server.find({});
-    if(servers) {
+    if (servers) {
       res.json(servers);
     }
   });
