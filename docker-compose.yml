@@ -20,6 +20,8 @@ services:
       - "27017:27017"
     volumes:
       - ./database:/data/db
+    logging:
+      driver: none
   bot:
     container_name: bot
     build: ./bot
