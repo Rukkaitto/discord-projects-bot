@@ -5,6 +5,7 @@ const { db } = require("./db");
 const {
   getServers,
   getServer,
+  getProjects,
   postServer,
   postProject,
   postMember,
@@ -22,6 +23,8 @@ db.once("open", () => {
   api.get("/servers", getServers);
 
   api.get("/:serverId", getServer);
+
+  api.get("/:serverId/projects", getProjects);
 
   api.post("/servers", postServer);
 

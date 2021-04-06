@@ -11,6 +11,12 @@ const getServer = async (req, res) => {
   res.json(server);
 };
 
+const getProjects = async (req, res) => {
+  const { serverId } = req.params;
+  const { projects } = await Server.findById(serverId);
+  res.json(projects);
+};
+
 const postServer = async (req, res) => {
   const { _id, name, icon } = req.body;
   server = new Server({
@@ -67,6 +73,7 @@ const postMember = async (req, res) => {
 module.exports = {
   getServers,
   getServer,
+  getProjects,
   postServer,
   postProject,
   postMember,
