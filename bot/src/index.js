@@ -1,11 +1,7 @@
 require("dotenv").config();
 const { Client } = require("discord.js");
-const { postProject, postMember } = require("./api");
-const {
-  getOrCreateServer,
-  makeProjectListMessageEmbed,
-  addReactionsToMessage,
-} = require("./utils");
+const { getOrCreateServer } = require("./utils");
+const { create, list, join } = require("./actions");
 
 const client = new Client({ partials: ["MESSAGE", "CHANNEL", "REACTION"] });
 const token = process.env.DISCORD_TOKEN;
@@ -26,33 +22,17 @@ client.on("message", async (message) => {
     const server = await getOrCreateServer(guild);
     const { projects } = server;
 
+    const user = [author.id, username, author.displayAvatarURL()];
+
     switch (action) {
       case "create":
-        const title = param;
-        const projectResult = await postProject(
-          guild.id,
-          title,
-          author.id,
-          username,
-          author.displayAvatarURL()
-        );
-        message.reply(projectResult.response);
+        await create(message, guild.id, param, user);
         break;
       case "list":
-        const messageEmbed = makeProjectListMessageEmbed(projects);
-        await channel.send(messageEmbed);
-
+        await list(projects, channel);
         break;
       case "join":
-        const number = parseInt(param);
-        const memberResult = await postMember(
-          guild.id,
-          projects[number - 1]._id,
-          author.id,
-          username,
-          author.displayAvatarURL()
-        );
-        message.reply(memberResult.response);
+        await join(param, projects, author.id, guild.id, user, message);
         break;
       default:
         break;
