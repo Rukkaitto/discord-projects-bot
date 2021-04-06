@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
-const { db, Server } = require("./db");
+const cors = require("cors");
+const { db } = require("./db");
 const {
   getServers,
   getServer,
@@ -11,8 +12,9 @@ const {
 const api = express();
 
 api.use(express.json());
+api.use(cors());
 
-const port = 3000;
+const port = 3001;
 
 db.on("error", console.error.bind(console, "connection error:"));
 
