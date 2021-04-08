@@ -83,6 +83,20 @@ const deleteMember = async (req, res) => {
   }
 };
 
+const deleteProject = async (req, res) => {
+  const { serverId, projectId } = req.params;
+  const server = await Server.findById(serverId);
+  server.projects = server.projects.filter(
+    (project) => project._id != projectId
+  );
+  const result = await server.save();
+  if (result) {
+    res.json({ response: "Successfully deleted project." });
+  } else {
+    res.json({ response: "Could not delete project." });
+  }
+};
+
 module.exports = {
   getServers,
   getServer,
@@ -91,4 +105,5 @@ module.exports = {
   postProject,
   postMember,
   deleteMember,
+  deleteProject,
 };
