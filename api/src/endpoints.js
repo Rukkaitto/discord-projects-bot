@@ -70,6 +70,27 @@ const postMember = async (req, res) => {
   }
 };
 
+const postLog = async (req, res) => {
+  const { serverId, projectId } = req.params;
+  const { message, userId, username, avatar } = req.body;
+  const server = await Server.findById(serverId);
+  const project = await server.projects.id(projectId);
+  project.logs.push({
+    author: {
+      userId,
+      username,
+      avatar,
+    },
+    message: message,
+  });
+  const result = await server.save();
+  if (result) {
+    res.json({ response: "Successfully added log to project." });
+  } else {
+    res.json({ response: "Could not add log to project." });
+  }
+};
+
 const deleteMember = async (req, res) => {
   const { serverId, projectId, memberId } = req.params;
   const server = await Server.findById(serverId);
@@ -110,6 +131,7 @@ module.exports = {
   postServer,
   postProject,
   postMember,
+  postLog,
   deleteMember,
   deleteProject,
 };

@@ -33,14 +33,26 @@ const makeUsageMessageEmbed = () => {
     .setTitle("List of available commands:")
     .setColor("#81f097")
     .addFields(
+      { name: "!project list", value: "List all the projects on this server." },
       {
         name: "!project create <Project Name>",
-        value: "Creates a new project.",
+        value: "Create a new project.",
       },
-      { name: "!project list", value: "Lists all projects on this server." },
+      {
+        name: "!project log <project-number> <Log message>",
+        value: "Add a log to a project.",
+      },
+      {
+        name: "!project delete <project-number>",
+        value: "Delete a project.",
+      },
       {
         name: "!project join <project-number>",
-        value: "Adds the user to a project.",
+        value: "Join a project.",
+      },
+      {
+        name: "!project leave <project-number>",
+        value: "Leave a project.",
       }
     );
   return messageEmbed;

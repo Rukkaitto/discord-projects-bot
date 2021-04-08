@@ -30,6 +30,23 @@ const postMember = async (serverId, projectId, _id, username, avatar) => {
   return response.data;
 };
 
+const postLog = async (
+  serverId,
+  projectId,
+  message,
+  userId,
+  username,
+  avatar
+) => {
+  const response = await axios.post(`${apiUrl}/${serverId}/${projectId}/logs`, {
+    message,
+    userId,
+    username,
+    avatar,
+  });
+  return response.data;
+};
+
 const deleteMember = async (serverId, projectId, memberId) => {
   const response = await axios.delete(
     `${apiUrl}/${serverId}/${projectId}/${memberId}`
@@ -47,6 +64,7 @@ module.exports = {
   postServer,
   postProject,
   postMember,
+  postLog,
   deleteMember,
   deleteProject,
 };

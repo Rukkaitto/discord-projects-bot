@@ -9,6 +9,7 @@ const {
   postServer,
   postProject,
   postMember,
+  postLog,
   deleteMember,
   deleteProject,
 } = require("./endpoints");
@@ -33,6 +34,8 @@ db.once("open", () => {
   api.post("/:serverId/projects", postProject);
 
   api.post("/:serverId/:projectId/members", postMember);
+
+  api.post("/:serverId/:projectId/logs", postLog);
 
   api.delete("/:serverId/:projectId/:memberId", deleteMember);
 

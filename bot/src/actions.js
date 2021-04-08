@@ -3,6 +3,7 @@ const {
   postMember,
   deleteMember,
   deleteProject,
+  postLog,
 } = require("./api");
 const {
   makeProjectListMessageEmbed,
@@ -76,6 +77,37 @@ const remove = async (param, projects, message, guildId, authorId) => {
   }
 };
 
+const log = async (
+  projectNumber,
+  logMessage,
+  projects,
+  authorId,
+  guildId,
+  user,
+  message
+) => {
+  const number = parseInt(projectNumber);
+  if (number && number <= projects.length) {
+    const selectedProject = projects[number - 1];
+    const userInMembers = selectedProject.members
+      .map((member) => member._id)
+      .includes(authorId);
+    if (userInMembers) {
+      const result = await postLog(
+        guildId,
+        selectedProject._id,
+        logMessage,
+        ...user
+      );
+      message.reply(result.response);
+    } else {
+      message.reply("You are not a member of this project.");
+    }
+  } else {
+    message.reply("Invalid project number.");
+  }
+};
+
 const usage = async (channel) => {
   const messageEmbed = makeUsageMessageEmbed();
   await sendMessageEmbed(channel, messageEmbed);
@@ -88,4 +120,5 @@ module.exports = {
   leave,
   usage,
   remove,
+  log,
 };

@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { Client } = require("discord.js");
 const { getOrCreateServer } = require("./utils");
-const { create, remove, list, join, leave, usage } = require("./actions");
+const { create, remove, list, join, leave, usage, log } = require("./actions");
 
 const client = new Client({ partials: ["MESSAGE", "CHANNEL", "REACTION"] });
 const token = process.env.DISCORD_TOKEN;
@@ -16,6 +16,8 @@ client.on("message", async (message) => {
   const { username } = author;
   const [command, action, ...params] = content.split(" ");
   const param = params.join(" ");
+  const [projectNumber, ...logMessageWords] = params;
+  const logMessage = logMessageWords.join(" ");
   const projectCommand = "!project";
 
   if (command === projectCommand) {
@@ -39,6 +41,17 @@ client.on("message", async (message) => {
         break;
       case "leave":
         await leave(param, projects, author.id, guild.id, message);
+        break;
+      case "log":
+        await log(
+          projectNumber,
+          logMessage,
+          projects,
+          author.id,
+          guild.id,
+          user,
+          message
+        );
         break;
       default:
         await usage(channel);
