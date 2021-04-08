@@ -76,6 +76,12 @@ const deleteMember = async (req, res) => {
   const project = await server.projects.id(projectId);
   project.members = project.members.filter((member) => member._id !== memberId);
   const result = await server.save();
+  if (project.members.length == 0) {
+    server.projects = server.projects.filter(
+      (project) => project._id != projectId
+    );
+    await server.save();
+  }
   if (result) {
     res.json({ response: "Successfully removed member from project." });
   } else {
