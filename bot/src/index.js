@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { Client } = require("discord.js");
 const { getOrCreateServer } = require("./utils");
-const { create, list, join, usage } = require("./actions");
+const { create, list, join, leave, usage } = require("./actions");
 
 const client = new Client({ partials: ["MESSAGE", "CHANNEL", "REACTION"] });
 const token = process.env.DISCORD_TOKEN;
@@ -33,6 +33,9 @@ client.on("message", async (message) => {
         break;
       case "join":
         await join(param, projects, author.id, guild.id, user, message);
+        break;
+      case "leave":
+        await leave(param, projects, author.id, guild.id, message);
         break;
       default:
         await usage(channel);

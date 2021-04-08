@@ -1,4 +1,4 @@
-const { postProject, postMember } = require("./api");
+const { postProject, postMember, deleteMember } = require("./api");
 const {
   makeProjectListMessageEmbed,
   makeUsageMessageEmbed,
@@ -37,6 +37,24 @@ const join = async (param, projects, authorId, guildId, user, message) => {
   }
 };
 
+const leave = async (param, projects, authorId, guildId, message) => {
+  const number = parseInt(param);
+  if (number && number <= projects.length) {
+    const selectedProject = projects[number - 1];
+    const userInMembers = selectedProject.members
+      .map((member) => member._id)
+      .includes(authorId);
+    if (userInMembers) {
+      const result = await deleteMember(guildId, selectedProject._id, authorId);
+      message.reply(result.response);
+    } else {
+      message.reply("You are not part of this project.");
+    }
+  } else {
+    message.reply("Invalid project number.");
+  }
+};
+
 const usage = async (channel) => {
   const messageEmbed = makeUsageMessageEmbed();
   await sendMessageEmbed(channel, messageEmbed);
@@ -46,5 +64,6 @@ module.exports = {
   create,
   list,
   join,
+  leave,
   usage,
 };

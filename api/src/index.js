@@ -9,6 +9,7 @@ const {
   postServer,
   postProject,
   postMember,
+  deleteMember,
 } = require("./endpoints");
 const api = express();
 
@@ -31,6 +32,8 @@ db.once("open", () => {
   api.post("/:serverId/projects", postProject);
 
   api.post("/:serverId/:projectId/members", postMember);
+
+  api.delete("/:serverId/:projectId/:memberId", deleteMember);
 
   api.listen(port, () => {
     console.log(`Listening on port ${port}`);

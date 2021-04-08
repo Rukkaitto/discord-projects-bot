@@ -70,6 +70,19 @@ const postMember = async (req, res) => {
   }
 };
 
+const deleteMember = async (req, res) => {
+  const { serverId, projectId, memberId } = req.params;
+  const server = await Server.findById(serverId);
+  const project = await server.projects.id(projectId);
+  project.members = project.members.filter((member) => member._id !== memberId);
+  const result = await server.save();
+  if (result) {
+    res.json({ response: "Successfully removed member from project." });
+  } else {
+    res.json({ response: "Could not remove member from project." });
+  }
+};
+
 module.exports = {
   getServers,
   getServer,
@@ -77,4 +90,5 @@ module.exports = {
   postServer,
   postProject,
   postMember,
+  deleteMember,
 };
