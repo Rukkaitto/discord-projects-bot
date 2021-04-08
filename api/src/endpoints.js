@@ -17,6 +17,13 @@ const getProjects = async (req, res) => {
   res.json(projects);
 };
 
+const getLogs = async (req, res) => {
+  const { serverId, projectId } = req.params;
+  const server = await Server.findById(serverId);
+  const project = await server.projects.id(projectId);
+  res.json(project.logs);
+};
+
 const postServer = async (req, res) => {
   const { _id, name, icon } = req.body;
   server = new Server({
@@ -128,6 +135,7 @@ module.exports = {
   getServers,
   getServer,
   getProjects,
+  getLogs,
   postServer,
   postProject,
   postMember,

@@ -6,6 +6,7 @@ const {
   getServers,
   getServer,
   getProjects,
+  getLogs,
   postServer,
   postProject,
   postMember,
@@ -28,6 +29,8 @@ db.once("open", () => {
   api.get("/:serverId", getServer);
 
   api.get("/:serverId/projects", getProjects);
+
+  api.get("/:serverId/:projectId/logs", getLogs);
 
   api.post("/servers", postServer);
 
