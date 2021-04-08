@@ -1,5 +1,9 @@
 const { postProject, postMember } = require("./api");
-const { makeProjectListMessageEmbed } = require("./utils");
+const {
+  makeProjectListMessageEmbed,
+  makeUsageMessageEmbed,
+  sendMessageEmbed,
+} = require("./utils");
 
 const create = async (message, guildId, title, user) => {
   const projectResult = await postProject(guildId, title, ...user);
@@ -8,11 +12,7 @@ const create = async (message, guildId, title, user) => {
 
 const list = async (projects, channel) => {
   const messageEmbed = makeProjectListMessageEmbed(projects);
-  try {
-    await channel.send(messageEmbed);
-  } catch (error) {
-    channel.send("Please allow Embed Links in this channel.");
-  }
+  await sendMessageEmbed(channel, messageEmbed);
 };
 
 const join = async (param, projects, authorId, guildId, user, message) => {
@@ -37,8 +37,14 @@ const join = async (param, projects, authorId, guildId, user, message) => {
   }
 };
 
+const usage = async (channel) => {
+  const messageEmbed = makeUsageMessageEmbed();
+  await sendMessageEmbed(channel, messageEmbed);
+};
+
 module.exports = {
   create,
   list,
   join,
+  usage,
 };
