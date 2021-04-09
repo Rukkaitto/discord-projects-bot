@@ -1,32 +1,33 @@
-const { Server } = require("./db");
+import { Server } from "./db";
+import { Request, Response } from "express";
 
-const getServers = async (req, res) => {
+export const getServers = async (req: Request, res: Response) => {
   const servers = await Server.find({});
   res.json(servers);
 };
 
-const getServer = async (req, res) => {
+export const getServer = async (req: Request, res: Response) => {
   const { serverId } = req.params;
   const server = await Server.findById(serverId);
   res.json(server);
 };
 
-const getProjects = async (req, res) => {
+export const getProjects = async (req: Request, res: Response) => {
   const { serverId } = req.params;
   const { projects } = await Server.findById(serverId);
   res.json(projects);
 };
 
-const getLogs = async (req, res) => {
+export const getLogs = async (req: Request, res: Response) => {
   const { serverId, projectId } = req.params;
   const server = await Server.findById(serverId);
   const project = await server.projects.id(projectId);
   res.json(project.logs);
 };
 
-const postServer = async (req, res) => {
+export const postServer = async (req: Request, res: Response) => {
   const { _id, name, icon } = req.body;
-  server = new Server({
+  const server = new Server({
     _id,
     name,
     icon,
@@ -35,7 +36,7 @@ const postServer = async (req, res) => {
   res.json(result);
 };
 
-const postProject = async (req, res) => {
+export const postProject = async (req: Request, res: Response) => {
   const { serverId } = req.params;
   const { title, _id, username, avatar } = req.body;
   const server = await Server.findById(serverId);
@@ -59,7 +60,7 @@ const postProject = async (req, res) => {
   }
 };
 
-const postMember = async (req, res) => {
+export const postMember = async (req: Request, res: Response) => {
   const { serverId, projectId } = req.params;
   const { _id, username, avatar } = req.body;
   const server = await Server.findById(serverId);
@@ -77,7 +78,7 @@ const postMember = async (req, res) => {
   }
 };
 
-const postLog = async (req, res) => {
+export const postLog = async (req: Request, res: Response) => {
   const { serverId, projectId } = req.params;
   const { message, userId, username, avatar } = req.body;
   const server = await Server.findById(serverId);
@@ -98,15 +99,17 @@ const postLog = async (req, res) => {
   }
 };
 
-const deleteMember = async (req, res) => {
+export const deleteMember = async (req: Request, res: Response) => {
   const { serverId, projectId, memberId } = req.params;
   const server = await Server.findById(serverId);
   const project = await server.projects.id(projectId);
-  project.members = project.members.filter((member) => member._id !== memberId);
+  project.members = project.members.filter(
+    (member: any) => member._id !== memberId
+  );
   const result = await server.save();
   if (project.members.length == 0) {
     server.projects = server.projects.filter(
-      (project) => project._id != projectId
+      (project: any) => project._id != projectId
     );
     await server.save();
   }
@@ -117,11 +120,11 @@ const deleteMember = async (req, res) => {
   }
 };
 
-const deleteProject = async (req, res) => {
+export const deleteProject = async (req: Request, res: Response) => {
   const { serverId, projectId } = req.params;
   const server = await Server.findById(serverId);
   server.projects = server.projects.filter(
-    (project) => project._id != projectId
+    (project: any) => project._id != projectId
   );
   const result = await server.save();
   if (result) {
@@ -129,17 +132,4 @@ const deleteProject = async (req, res) => {
   } else {
     res.json({ response: "Could not delete project." });
   }
-};
-
-module.exports = {
-  getServers,
-  getServer,
-  getProjects,
-  getLogs,
-  postServer,
-  postProject,
-  postMember,
-  postLog,
-  deleteMember,
-  deleteProject,
 };

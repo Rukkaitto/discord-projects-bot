@@ -1,8 +1,8 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const { db } = require("./db");
-const {
+import express from "express";
+import cors from "cors";
+import { db } from "./db";
+
+import {
   getServers,
   getServer,
   getProjects,
@@ -13,7 +13,7 @@ const {
   postLog,
   deleteMember,
   deleteProject,
-} = require("./endpoints");
+} from "./endpoints";
 const api = express();
 
 api.use(express.json());
