@@ -1,17 +1,20 @@
-require("dotenv").config();
-const { Client } = require("discord.js");
-const { getOrCreateServer } = require("./utils");
-const { create, remove, list, join, leave, usage, log } = require("./actions");
+import { config } from "dotenv";
+config();
+import { Client, Message, TextChannel } from "discord.js";
+import { getOrCreateServer } from "./utils";
+import { create, remove, list, join, leave, usage, log } from "./actions";
+import { Member } from "./interfaces";
 
 const client = new Client({ partials: ["MESSAGE", "CHANNEL", "REACTION"] });
 const token = process.env.DISCORD_TOKEN;
 
 client.on("ready", () => {
-  console.log(`Logged in as ${client.user.tag}!`);
+  console.log(`Logged in as ${client.user?.tag}!`);
 });
 
-client.on("message", async (message) => {
-  const { content, channel, author } = message;
+client.on("message", async (message: Message) => {
+  const { content, author } = message;
+  const channel = message.channel as TextChannel;
   const { guild } = channel;
   const { username } = author;
   const [command, action, ...params] = content.split(" ");
@@ -24,7 +27,11 @@ client.on("message", async (message) => {
     const server = await getOrCreateServer(guild);
     const { projects } = server;
 
-    const user = [author.id, username, author.displayAvatarURL()];
+    const user: Member = {
+      _id: author.id,
+      username: username,
+      avatar: author.displayAvatarURL(),
+    };
 
     switch (action) {
       case "create":

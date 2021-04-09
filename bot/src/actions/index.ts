@@ -1,27 +1,41 @@
-const {
+import { Channel, Message, TextChannel } from "discord.js";
+import {
   postProject,
   postMember,
   deleteMember,
   deleteProject,
   postLog,
-} = require("./api");
-const {
+} from "../api";
+import { Member, Project } from "../interfaces";
+import {
   makeProjectListMessageEmbed,
   makeUsageMessageEmbed,
   sendMessageEmbed,
-} = require("./utils");
+} from "../utils";
 
-const create = async (message, guildId, title, user) => {
-  const projectResult = await postProject(guildId, title, ...user);
+export const create = async (
+  message: Message,
+  guildId: string,
+  title: string,
+  user: Member
+) => {
+  const projectResult = await postProject(guildId, title, user);
   await message.reply(projectResult.response);
 };
 
-const list = async (projects, channel) => {
+export const list = async (projects: Project[], channel: TextChannel) => {
   const messageEmbed = makeProjectListMessageEmbed(projects);
   await sendMessageEmbed(channel, messageEmbed);
 };
 
-const join = async (param, projects, authorId, guildId, user, message) => {
+export const join = async (
+  param: string,
+  projects: Project[],
+  authorId: string,
+  guildId: string,
+  user: Member,
+  message: Message
+) => {
   const number = parseInt(param);
   if (number && number <= projects.length) {
     const selectedProject = projects[number - 1];
@@ -31,11 +45,7 @@ const join = async (param, projects, authorId, guildId, user, message) => {
     if (userInMembers) {
       message.reply("You are already a member of this project.");
     } else {
-      const memberResult = await postMember(
-        guildId,
-        selectedProject._id,
-        ...user
-      );
+      const memberResult = await postMember(guildId, selectedProject._id, user);
       message.reply(memberResult.response);
     }
   } else {
@@ -43,7 +53,13 @@ const join = async (param, projects, authorId, guildId, user, message) => {
   }
 };
 
-const leave = async (param, projects, authorId, guildId, message) => {
+export const leave = async (
+  param: string,
+  projects: Project[],
+  authorId: string,
+  guildId: string,
+  message: Message
+) => {
   const number = parseInt(param);
   if (number && number <= projects.length) {
     const selectedProject = projects[number - 1];
@@ -61,7 +77,13 @@ const leave = async (param, projects, authorId, guildId, message) => {
   }
 };
 
-const remove = async (param, projects, message, guildId, authorId) => {
+export const remove = async (
+  param: string,
+  projects: Project[],
+  message: Message,
+  guildId: string,
+  authorId: string
+) => {
   const number = parseInt(param);
   if (number && number <= projects.length) {
     const selectedProject = projects[number - 1];
@@ -77,14 +99,14 @@ const remove = async (param, projects, message, guildId, authorId) => {
   }
 };
 
-const log = async (
-  projectNumber,
-  logMessage,
-  projects,
-  authorId,
-  guildId,
-  user,
-  message
+export const log = async (
+  projectNumber: string,
+  logMessage: string,
+  projects: Project[],
+  authorId: string,
+  guildId: string,
+  user: Member,
+  message: Message
 ) => {
   const number = parseInt(projectNumber);
   if (number && number <= projects.length) {
@@ -97,7 +119,7 @@ const log = async (
         guildId,
         selectedProject._id,
         logMessage,
-        ...user
+        user
       );
       message.reply(result.response);
     } else {
@@ -108,17 +130,7 @@ const log = async (
   }
 };
 
-const usage = async (channel) => {
+export const usage = async (channel: TextChannel) => {
   const messageEmbed = makeUsageMessageEmbed();
   await sendMessageEmbed(channel, messageEmbed);
-};
-
-module.exports = {
-  create,
-  list,
-  join,
-  leave,
-  usage,
-  remove,
-  log,
 };

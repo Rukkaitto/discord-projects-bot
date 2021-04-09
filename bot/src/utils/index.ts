@@ -1,7 +1,8 @@
-const { MessageEmbed } = require("discord.js");
-const { getServer, postServer } = require("./api");
+import { Guild, MessageEmbed, TextChannel } from "discord.js";
+import { getServer, postServer } from "../api";
+import { Project } from "../interfaces";
 
-const getOrCreateServer = async (guild) => {
+export const getOrCreateServer = async (guild: Guild) => {
   const { id, name } = guild;
   const icon = guild.iconURL({ dynamic: true });
   var server = await getServer(id);
@@ -11,7 +12,7 @@ const getOrCreateServer = async (guild) => {
   return server;
 };
 
-const makeProjectListMessageEmbed = (projects) => {
+export const makeProjectListMessageEmbed = (projects: Project[]) => {
   const messageEmbed = new MessageEmbed()
     .setTitle("Project list")
     .setColor("#81f097");
@@ -28,7 +29,7 @@ const makeProjectListMessageEmbed = (projects) => {
   return messageEmbed;
 };
 
-const makeUsageMessageEmbed = () => {
+export const makeUsageMessageEmbed = () => {
   const messageEmbed = new MessageEmbed()
     .setTitle("List of available commands:")
     .setColor("#81f097")
@@ -58,24 +59,13 @@ const makeUsageMessageEmbed = () => {
   return messageEmbed;
 };
 
-const sendMessageEmbed = async (channel, messageEmbed) => {
+export const sendMessageEmbed = async (
+  channel: TextChannel,
+  messageEmbed: MessageEmbed
+) => {
   try {
     await channel.send(messageEmbed);
   } catch (error) {
     channel.send("Please allow Embed Links in this channel.");
   }
-};
-
-const addReactionsToMessage = async (message, emojis) => {
-  emojis.forEach(async (emoji) => {
-    await message.react(emoji);
-  });
-};
-
-module.exports = {
-  getOrCreateServer,
-  makeProjectListMessageEmbed,
-  makeUsageMessageEmbed,
-  addReactionsToMessage,
-  sendMessageEmbed,
 };

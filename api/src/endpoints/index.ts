@@ -1,4 +1,4 @@
-import { Server } from "./db";
+import { Server } from "../db";
 import { Request, Response } from "express";
 
 export const getServers = async (req: Request, res: Response) => {
