@@ -1,18 +1,17 @@
 import axios from "axios";
-import { APIResponse, Member, Server } from "../interfaces";
+import { Guild, User } from "discord.js";
+import { APIResponse, Log, Project, Server } from "../interfaces";
 
 const apiUrl = process.env.API_URL;
 
-export const getServer = async (serverId: string) => {
-  const response = await axios.get<Server>(`${apiUrl}/${serverId}`);
+export const getServer = async (guild: Guild) => {
+  const response = await axios.get<Server>(`${apiUrl}/${guild.id}`);
   return response.data;
 };
 
-export const postServer = async (
-  _id: string,
-  name: string,
-  icon: string | null
-) => {
+export const postServer = async (guild: Guild) => {
+  const { id: _id, name } = guild;
+  const icon = guild.iconURL({ dynamic: true });
   const response = await axios.post<Server>(`${apiUrl}/servers`, {
     _id,
     name,
@@ -22,13 +21,15 @@ export const postServer = async (
 };
 
 export const postProject = async (
-  serverId: string,
-  title: string,
-  user: Member
+  project: Project,
+  guild: Guild,
+  user: User
 ) => {
-  const { _id, username, avatar } = user;
+  const { title } = project;
+  const { id: _id, username } = user;
+  const avatar = user.avatarURL();
   const response = await axios.post<APIResponse>(
-    `${apiUrl}/${serverId}/projects`,
+    `${apiUrl}/${guild.id}/projects`,
     {
       title,
       _id,
@@ -40,27 +41,30 @@ export const postProject = async (
 };
 
 export const postMember = async (
-  serverId: string,
-  projectId: string,
-  user: Member
+  project: Project,
+  guild: Guild,
+  user: User
 ) => {
-  const { _id, username, avatar } = user;
+  const { id: _id, username } = user;
+  const avatar = user.avatarURL();
   const response = await axios.post<APIResponse>(
-    `${apiUrl}/${serverId}/${projectId}/members`,
+    `${apiUrl}/${guild.id}/${project._id}/members`,
     { _id, username, avatar }
   );
   return response.data;
 };
 
 export const postLog = async (
-  serverId: string,
-  projectId: string,
-  message: string,
-  user: Member
+  log: Log,
+  project: Project,
+  guild: Guild,
+  user: User
 ) => {
-  const { _id, username, avatar } = user;
+  const { message } = log;
+  const { id: _id, username } = user;
+  const avatar = user.avatarURL();
   const response = await axios.post<APIResponse>(
-    `${apiUrl}/${serverId}/${projectId}/logs`,
+    `${apiUrl}/${guild.id}/${project._id}/logs`,
     {
       message,
       _id,
@@ -72,19 +76,19 @@ export const postLog = async (
 };
 
 export const deleteMember = async (
-  serverId: string,
-  projectId: string,
-  memberId: string
+  user: User,
+  guild: Guild,
+  project: Project
 ) => {
   const response = await axios.delete<APIResponse>(
-    `${apiUrl}/${serverId}/${projectId}/${memberId}`
+    `${apiUrl}/${guild.id}/${project._id}/${user.id}`
   );
   return response.data;
 };
 
-export const deleteProject = async (serverId: string, projectId: string) => {
+export const deleteProject = async (project: Project, guild: Guild) => {
   const response = await axios.delete<APIResponse>(
-    `${apiUrl}/${serverId}/${projectId}`
+    `${apiUrl}/${guild.id}/${project._id}`
   );
   return response.data;
 };

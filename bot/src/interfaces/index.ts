@@ -5,10 +5,10 @@ export interface Member {
 }
 
 export interface Project {
-  _id: string;
+  _id?: string;
   title: string;
-  members: Member[];
-  logs: Log[];
+  members?: Member[];
+  logs?: Log[];
 }
 
 export interface Server {
@@ -19,12 +19,17 @@ export interface Server {
 }
 
 export interface Log {
-  _id: string;
-  author: Member;
+  _id?: string;
+  author?: Member;
   message: string;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface APIResponse {
   response: string;
+}
+
+export interface ActionParams {
+  projectNumber?: string | number;
+  argument?: string;
 }

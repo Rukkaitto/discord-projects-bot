@@ -19,7 +19,7 @@ client.on("message", async (message: Message) => {
   const { username } = author;
   const [command, action, ...params] = content.split(" ");
   const param = params.join(" ");
-  const [projectNumber, ...logMessageWords] = params;
+  var [projectNumber, ...logMessageWords] = params;
   const logMessage = logMessageWords.join(" ");
   const projectCommand = "!project";
 
@@ -27,37 +27,47 @@ client.on("message", async (message: Message) => {
     const server = await getOrCreateServer(guild);
     const { projects } = server;
 
-    const user: Member = {
-      _id: author.id,
-      username: username,
-      avatar: author.displayAvatarURL(),
-    };
-
     switch (action) {
       case "create":
-        await create(message, guild.id, param, user);
+        await create(message, { argument: param }, author, guild);
         break;
       case "delete":
-        await remove(param, projects, message, guild.id, author.id);
+        await remove(
+          message,
+          { projectNumber: projectNumber },
+          projects,
+          author,
+          guild
+        );
         break;
       case "list":
         await list(projects, channel);
         break;
       case "join":
-        await join(param, projects, author.id, guild.id, user, message);
+        await join(
+          message,
+          { projectNumber: projectNumber },
+          projects,
+          author,
+          guild
+        );
         break;
       case "leave":
-        await leave(param, projects, author.id, guild.id, message);
+        await leave(
+          message,
+          { projectNumber: projectNumber },
+          projects,
+          author,
+          guild
+        );
         break;
       case "log":
         await log(
-          projectNumber,
-          logMessage,
+          message,
+          { projectNumber: projectNumber, argument: logMessage },
           projects,
-          author.id,
-          guild.id,
-          user,
-          message
+          author,
+          guild
         );
         break;
       default:

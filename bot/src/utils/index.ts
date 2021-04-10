@@ -1,13 +1,11 @@
 import { Guild, MessageEmbed, TextChannel } from "discord.js";
 import { getServer, postServer } from "../api";
-import { Project } from "../interfaces";
+import { Member, Project } from "../interfaces";
 
 export const getOrCreateServer = async (guild: Guild) => {
-  const { id, name } = guild;
-  const icon = guild.iconURL({ dynamic: true });
-  var server = await getServer(id);
+  var server = await getServer(guild);
   if (!server) {
-    server = await postServer(id, name, icon);
+    server = await postServer(guild);
   }
   return server;
 };
@@ -17,7 +15,10 @@ export const makeProjectListMessageEmbed = (projects: Project[]) => {
     .setTitle("Project list")
     .setColor("#81f097");
   const fields = projects.map((project, idx) => {
-    const { title, members } = project;
+    const { title } = project;
+    var { members } = project;
+    members = members as Member[];
+
     return {
       name: `${idx + 1}. ${title}`,
       value: `Members: ${members

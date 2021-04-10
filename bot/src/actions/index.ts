@@ -1,4 +1,4 @@
-import { Channel, Message, TextChannel } from "discord.js";
+import { Guild, Message, TextChannel, User } from "discord.js";
 import {
   postProject,
   postMember,
@@ -6,7 +6,7 @@ import {
   deleteProject,
   postLog,
 } from "../api";
-import { Member, Project } from "../interfaces";
+import { ActionParams, Log, Member, Project } from "../interfaces";
 import {
   makeProjectListMessageEmbed,
   makeUsageMessageEmbed,
@@ -15,11 +15,14 @@ import {
 
 export const create = async (
   message: Message,
-  guildId: string,
-  title: string,
-  user: Member
+  params: ActionParams,
+  user: User,
+  guild: Guild
 ) => {
-  const projectResult = await postProject(guildId, title, user);
+  const project: Project = {
+    title: params.argument as string,
+  };
+  const projectResult = await postProject(project, guild, user);
   await message.reply(projectResult.response);
 };
 
@@ -29,23 +32,28 @@ export const list = async (projects: Project[], channel: TextChannel) => {
 };
 
 export const join = async (
-  param: string,
+  message: Message,
+  params: ActionParams,
   projects: Project[],
-  authorId: string,
-  guildId: string,
-  user: Member,
-  message: Message
+  author: User,
+  guild: Guild
 ) => {
-  const number = parseInt(param);
-  if (number && number <= projects.length) {
-    const selectedProject = projects[number - 1];
-    const userInMembers = selectedProject.members
+  var { projectNumber } = params;
+  projectNumber = parseInt(projectNumber as string);
+
+  if (projectNumber && projectNumber <= projects.length) {
+    const selectedProject = projects[projectNumber - 1];
+    var { members } = selectedProject;
+    members = members as Member[];
+
+    const userInMembers = members
       .map((member) => member._id)
-      .includes(authorId);
+      .includes(author.id);
+
     if (userInMembers) {
       message.reply("You are already a member of this project.");
     } else {
-      const memberResult = await postMember(guildId, selectedProject._id, user);
+      const memberResult = await postMember(selectedProject, guild, author);
       message.reply(memberResult.response);
     }
   } else {
@@ -54,20 +62,26 @@ export const join = async (
 };
 
 export const leave = async (
-  param: string,
+  message: Message,
+  params: ActionParams,
   projects: Project[],
-  authorId: string,
-  guildId: string,
-  message: Message
+  author: User,
+  guild: Guild
 ) => {
-  const number = parseInt(param);
-  if (number && number <= projects.length) {
-    const selectedProject = projects[number - 1];
-    const userInMembers = selectedProject.members
+  var { projectNumber } = params;
+  projectNumber = parseInt(projectNumber as string);
+
+  if (projectNumber && projectNumber <= projects.length) {
+    const selectedProject = projects[projectNumber - 1];
+    var { members } = selectedProject;
+    members = members as Member[];
+
+    const userInMembers = members
       .map((member) => member._id)
-      .includes(authorId);
+      .includes(author.id);
+
     if (userInMembers) {
-      const result = await deleteMember(guildId, selectedProject._id, authorId);
+      const result = await deleteMember(author, guild, selectedProject);
       message.reply(result.response);
     } else {
       message.reply("You are not part of this project.");
@@ -78,18 +92,24 @@ export const leave = async (
 };
 
 export const remove = async (
-  param: string,
-  projects: Project[],
   message: Message,
-  guildId: string,
-  authorId: string
+  params: ActionParams,
+  projects: Project[],
+  author: User,
+  guild: Guild
 ) => {
-  const number = parseInt(param);
-  if (number && number <= projects.length) {
-    const selectedProject = projects[number - 1];
-    const userIsCreator = selectedProject.members[0]._id === authorId;
+  var { projectNumber } = params;
+  projectNumber = parseInt(projectNumber as string);
+
+  if (projectNumber && projectNumber <= projects.length) {
+    const selectedProject = projects[projectNumber - 1];
+    var { members } = selectedProject;
+    members = members as Member[];
+
+    const userIsCreator = members[0]._id === author.id;
+
     if (userIsCreator) {
-      const result = await deleteProject(guildId, selectedProject._id);
+      const result = await deleteProject(selectedProject, guild);
       message.reply(result.response);
     } else {
       message.reply("You are not the creator of this project");
@@ -100,26 +120,35 @@ export const remove = async (
 };
 
 export const log = async (
-  projectNumber: string,
-  logMessage: string,
+  message: Message,
+  params: ActionParams,
   projects: Project[],
-  authorId: string,
-  guildId: string,
-  user: Member,
-  message: Message
+  author: User,
+  guild: Guild
 ) => {
-  const number = parseInt(projectNumber);
-  if (number && number <= projects.length) {
-    const selectedProject = projects[number - 1];
-    const userInMembers = selectedProject.members
+  var { projectNumber, argument } = params;
+  projectNumber = parseInt(projectNumber as string);
+  argument = argument as string;
+
+  const log: Log = {
+    message: argument
+  }
+
+  if (projectNumber && projectNumber <= projects.length) {
+    const selectedProject = projects[projectNumber - 1];
+    var { members } = selectedProject;
+    members = members as Member[];
+
+    const userInMembers = members
       .map((member) => member._id)
-      .includes(authorId);
+      .includes(author.id);
+
     if (userInMembers) {
       const result = await postLog(
-        guildId,
-        selectedProject._id,
-        logMessage,
-        user
+        log,
+        selectedProject,
+        guild,
+        author,
       );
       message.reply(result.response);
     } else {
